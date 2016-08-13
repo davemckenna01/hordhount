@@ -8,7 +8,7 @@ import Report
 -- > (12, 3, 0, 'x') 12 characters, 3 words, 0 lines, last char = 'x'
 
 tick :: Char -> State (Report, Char) ()
-tick x = state $ \s -> ((), addToReport s x) 
+tick x = state $ \report -> ((), addToReport report x) 
 
 count :: [Char] -> State (Report, Char) ()
 count [] = return ()
@@ -27,7 +27,7 @@ stateMonadStyle = do
     file <- readFile filename
     -- there's runState, execState, and evalState, all similar only they
     -- differ in what parts of the tuple they return (fst, snd, or both)
-    let finalState = execState (count file) (Report 0 0 1,'x')
+    let finalState = execState (count file) (Report 0 0 1, 'x') -- 'x' could be anything
     print $ fst finalState 
 
 main = stateMonadStyle
