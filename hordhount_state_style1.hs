@@ -1,4 +1,5 @@
 import System.Environment
+import Control.Monad.State
 
 -- A simple word count "wc" clone
 
@@ -14,15 +15,20 @@ advanceState (c, w, ln, last) x
     | x == '\n'                                = (c,     w,     ln + 1, x)
     | otherwise                                = (c + 1, w,     ln,     x)
 
-count :: [Char] -> (Int, Int, Int, Char)
-count = foldl advanceState (0,0,1,'x') -- init char could be anything
+count :: [Char] -> State (Int, Int, Int, Char) ()
+count [] = return ()
+count (x:xs) = do
+    s <- get
+    put $ advanceState s x
+    count xs
+    return ()
 
-foldStyle :: IO ()
-foldStyle = do
+stateMonadStyle :: IO ()
+stateMonadStyle = do
     args <- getArgs
     let filename = head args
     file <- readFile filename
-    print $ count file
+    let finalState = runState (count file) (0,0,1,'x')
+    print $ snd finalState 
 
-main = foldStyle
-
+main = stateMonadStyle
