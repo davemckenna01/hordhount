@@ -5,18 +5,26 @@ import System.Environment
 -- count 'dave is cool'
 -- > (12, 3, 0, 'x') 12 characters, 3 words, 0 lines, last char = 'x'
 
+data Report = Report {
+    characters :: Int,
+    words      :: Int,
+    lines      :: Int
+} deriving Show
+
 -- this could be called "categorize"... it advances the state of the counters
 -- based on how it categorizes a character
-advanceState :: (Int, Int, Int, Char) -> Char -> (Int, Int, Int, Char)
-advanceState (c, w, ln, last) x 
-    | x == ' '  && last /= ' '                 = (c + 1, w + 1, ln,     x)
-    | x == '\n' && last /= ' ' && last /= '\n' = (c,     w + 1, ln + 1, x)
-    | x == '\n'                                = (c,     w,     ln + 1, x)
-    | otherwise                                = (c + 1, w,     ln,     x)
+advanceState :: (Report, Char) -> Char -> (Report, Char)
+advanceState (Report c w ln, last) x 
+    | x == ' '  && last /= ' '                 = (Report (c + 1) (w + 1)  ln,      x)
+    | x == '\n' && last /= ' ' && last /= '\n' = (Report  c      (w + 1) (ln + 1), x)
+    | x == '\n'                                = (Report  c       w      (ln + 1), x)
+    | otherwise                                = (Report (c + 1)  w       ln,      x)
 
-count :: [Char] -> (Int, Int, Int, Char)
-count = foldl advanceState (0,0,1,'x') -- init char could be anything
+count :: [Char] -> (Report, Char)
+count = foldl advanceState (Report 0 0 1, 'x') -- init char could be anything
 
+-- it's very interesting that reduce + state monad are similar for this
+-- problem!
 foldStyle :: IO ()
 foldStyle = do
     args <- getArgs
