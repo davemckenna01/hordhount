@@ -34,7 +34,9 @@ stateMonadStyle = do
     args <- getArgs
     let filename = head args
     file <- readFile filename
-    let finalState = runState (count file) (Report 0 0 1,'x')
-    print $ snd finalState 
+    -- there's runState, execState, and evalState, all similar only they
+    -- differ in what parts of the tuple they return (fst, snd, or both)
+    let finalState = execState (count file) (Report 0 0 1,'x')
+    print $ fst finalState 
 
 main = stateMonadStyle
