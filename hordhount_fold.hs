@@ -3,7 +3,7 @@ import System.Environment
 -- A simple word count "wc" clone
 
 -- count 'dave is cool'
--- > [12, 3, 0] 12 characters, 3 words, 0 lines
+-- > (12, 3, 0, 'x') 12 characters, 3 words, 0 lines, last char = 'x'
 
 categorize :: (Int, Int, Int, Char) -> Char -> (Int, Int, Int, Char)
 categorize (c, w, ln, last) x 
@@ -15,11 +15,12 @@ categorize (c, w, ln, last) x
 count :: [Char] -> (Int, Int, Int, Char)
 count = foldl categorize (0,0,1,'x') -- init char could be anything
 
-main = do
+foldStyle :: IO ()
+foldStyle = do
     args <- getArgs
     let filename = head args
     file <- readFile filename
     print $ count file
 
-
+main = foldStyle
 
