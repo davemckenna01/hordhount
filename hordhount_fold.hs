@@ -13,15 +13,15 @@ data Report = Report {
 
 -- this could be called "categorize"... it advances the state of the counters
 -- based on how it categorizes a character
-advanceState :: (Report, Char) -> Char -> (Report, Char)
-advanceState (Report c w ln, last) x 
+addToReport :: (Report, Char) -> Char -> (Report, Char)
+addToReport (Report c w ln, last) x 
     | x == ' '  && last /= ' '                 = (Report (c + 1) (w + 1)  ln,      x)
     | x == '\n' && last /= ' ' && last /= '\n' = (Report  c      (w + 1) (ln + 1), x)
     | x == '\n'                                = (Report  c       w      (ln + 1), x)
     | otherwise                                = (Report (c + 1)  w       ln,      x)
 
 count :: [Char] -> (Report, Char)
-count = foldl advanceState (Report 0 0 1, 'x') -- init char could be anything
+count = foldl addToReport (Report 0 0 1, 'x') -- init char could be anything
 
 -- it's very interesting that reduce + state monad are similar for this
 -- problem!

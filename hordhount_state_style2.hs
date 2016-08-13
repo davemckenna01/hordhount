@@ -14,15 +14,15 @@ data Report = Report {
 
 -- this could be called "categorize"... it advances the state of the counters
 -- based on how it categorizes a character
-advanceState :: (Report, Char) -> Char -> (Report, Char)
-advanceState (Report c w ln, last) x 
+addToReport :: (Report, Char) -> Char -> (Report, Char)
+addToReport (Report c w ln, last) x 
     | x == ' '  && last /= ' '                 = (Report (c + 1) (w + 1)  ln,      x)
     | x == '\n' && last /= ' ' && last /= '\n' = (Report  c      (w + 1) (ln + 1), x)
     | x == '\n'                                = (Report  c       w      (ln + 1), x)
     | otherwise                                = (Report (c + 1)  w       ln,      x)
 
 tick :: Char -> State (Report, Char) ()
-tick x = state $ \s -> ((), advanceState s x) 
+tick x = state $ \s -> ((), addToReport s x) 
 
 count :: [Char] -> State (Report, Char) ()
 count [] = return ()

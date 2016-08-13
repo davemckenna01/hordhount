@@ -14,8 +14,8 @@ data Report = Report {
 
 -- this could be called "categorize"... it advances the state of the counters
 -- based on how it categorizes a character
-advanceState :: (Report, Char) -> Char -> (Report, Char)
-advanceState (Report c w ln, last) x 
+addToReport :: (Report, Char) -> Char -> (Report, Char)
+addToReport (Report c w ln, last) x 
     | x == ' '  && last /= ' '                 = (Report (c + 1) (w + 1)  ln,      x)
     | x == '\n' && last /= ' ' && last /= '\n' = (Report  c      (w + 1) (ln + 1), x)
     | x == '\n'                                = (Report  c       w      (ln + 1), x)
@@ -25,7 +25,7 @@ count :: [Char] -> State (Report, Char) ()
 count [] = return ()
 count (x:xs) = do
     s <- get
-    put $ advanceState s x
+    put $ addToReport s x
     count xs
     return ()
 
