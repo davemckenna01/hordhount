@@ -17,8 +17,9 @@ count (x:xs) = do
     count xs
     return ()
 
--- this is equiv and actually works:
+-- these are equiv and actually compile:
 --count (x:xs) = tick x >>= \s -> count xs >>= \s -> return ()
+--count (x:xs) = tick x >> count xs >> return ()
 
 stateMonadStyle :: IO ()
 stateMonadStyle = do
