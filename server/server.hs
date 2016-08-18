@@ -5,11 +5,22 @@ import qualified Data.ByteString.Char8 as C8
 import qualified Data.ByteString.UTF8 as UTF8
 import Network.Socket.ByteString (recv, sendAll)
 
+
+type Handler = ( S.ByteString, (S.ByteString -> S.ByteString ) )
+
+handleDave :: S.ByteString -> S.ByteString
+handleDave arg = C8.tail arg
+
+-- contrived processing of route (we just get req.body.arg's tail)
+handlers = (C8.pack "dave\r\n", \arg -> C8.tail arg) : []
+
 dispatchRequest :: Socket -> S.ByteString -> IO ()
 dispatchRequest conn msg = do
-    let converted = UTF8.fromString "wobbalobbaΩdingdong"
-    sendAll conn converted
-
+    -- let converted = UTF8.fromString "wobbalobbaΩdingdong"
+    -- let handler = 
+    -- let trimmed
+    case lookup msg handlers of Just handler -> sendAll conn $ handler (C8.pack "testarg")
+                                Nothing      -> sendAll conn $ C8.pack "not found"
 main :: IO ()
 main = withSocketsDo $ do
         addrinfos <- getAddrInfo
@@ -29,3 +40,5 @@ main = withSocketsDo $ do
         talk conn = do
             msg <- recv conn 1024
             unless (S.null msg) $ dispatchRequest conn msg >> talk conn
+
+
