@@ -6,21 +6,22 @@ import qualified Data.ByteString.UTF8 as UTF8
 import Network.Socket.ByteString (recv, sendAll)
 
 
-type Handler = ( S.ByteString, (S.ByteString -> S.ByteString ) )
+--type Handler = ( S.ByteString, (S.ByteString -> S.ByteString ) )
 
-handleDave :: S.ByteString -> S.ByteString
-handleDave arg = C8.tail arg
+--handleDave :: S.ByteString -> S.ByteString
+--handleDave arg = C8.tail arg
 
 -- contrived processing of route (we just get req.body.arg's tail)
-handlers = (C8.pack "dave\r\n", \arg -> C8.tail arg) : []
+handlers = ("dave\r\n", \arg -> tail arg) : ("kev\r\n", \arg -> reverse arg) : []
 
 dispatchRequest :: Socket -> S.ByteString -> IO ()
 dispatchRequest conn msg = do
     -- let converted = UTF8.fromString "wobbalobbaΩdingdong"
     -- let handler = 
     -- let trimmed
-    case lookup msg handlers of Just handler -> sendAll conn $ handler (C8.pack "testarg")
-                                Nothing      -> sendAll conn $ C8.pack "not found"
+    let param = "testarg"
+    case lookup (C8.unpack msg) handlers of Just handler -> sendAll conn $ C8.pack $ handler param
+                                            Nothing      -> sendAll conn $ C8.pack "not found"
 main :: IO ()
 main = withSocketsDo $ do
         addrinfos <- getAddrInfo
